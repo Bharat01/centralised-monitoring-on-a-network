@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery.min.js"></script>
+<script src="highcharts.js"></script>
+<script>
+plottedindex=0;
+chart = null;
+function range(n) {
+    var i = 0;
+    var array = [];
+    while(i<n) {
+        array.push(i);
+        i++;
+    }
+    return array;
+}
+
+function toInt(array) {
+    var i = 0;
+    var n = array.length - 1;
+    var ar = [];
+    while(i<=n) {
+        ar.push(Number(array[i]));
+        i++;
+    }
+    return ar;
+}
+           
+function loadXMLDoc()
+{
+var xmlhttp;
+if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+  xmlhttp=new XMLHttpRequest();
+  }
+else
+  {// code for IE6, IE5
+  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+    setTimeout(update, 2000);
+    var text=xmlhttp.responseText;
+    var json_data = JSON.parse(text);
+    var series = [];
+    for(data in json_data){
+        series.push({
+            name: data,
+            data: toInt(json_data[data])
+        });
+    }  
+    
+    $(function () {
+    chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'container',
+            type: 'line'
+        },
+        title: {
+            text: 'Real Time RAM Updation  '
+        },
+        yAxis: {
+            title: {
+                text: 'avail RAM'
+            }
+        },
+        series: series
+    });
+});
+    
+    
+    }
+  }
+xmlhttp.open("GET","bharat.txt",true);
+xmlhttp.send();
+}
+function update()
+{
+var xmlhttp;
+if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+  xmlhttp=new XMLHttpRequest();
+  }
+else
+  {// code for IE6, IE5
+  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+  {
+    var text=xmlhttp.responseText;
+    var json_data = JSON.parse(text);
+    var series = [];
+    var i = 0;
+    for(data in json_data){
+        chart.series[i].setData(toInt(json_data[data]));
+        i++;
+    }  
+  }
+}
+xmlhttp.open("GET","bharat.txt",true);
+xmlhttp.send();
+setTimeout(update, 2000);
+}
+</script>
+</head>
+<body>
+<div id="container"></div>
+<div id="myDiv"><h2>Click here to see Dynamic RAM </h2></div>
+<button type="button" onclick="loadXMLDoc()">CLICK HERE</button>
+
+</body>
+</html>
